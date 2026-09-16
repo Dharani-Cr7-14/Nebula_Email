@@ -4,6 +4,24 @@ A full-stack, AI-powered web email client that connects to real Gmail accounts v
 
 ---
 
+## Demo Access
+
+> This is a dedicated demo account created only for evaluating NebulaMail AI.
+
+**Demo Gmail:** nebulamail.demo@gmail.com  
+**Password:** Nebula@123
+
+### How to test
+
+1. Open NebulaMail AI (`http://localhost:5173` with both servers running).
+2. Click **"Continue with Google"**.
+3. Sign in using the demo Gmail account above.
+4. Complete Google's normal verification if prompted.
+5. Grant the requested Gmail permissions.
+6. Test Inbox, Sent, Search, Compose, Reply, Send, AI Search, and AI Load More.
+
+---
+
 ## Overview
 
 NebulaMail AI is a Gmail-connected email client with a built-in AI copilot. Users can manage their email — read, compose, reply, search, and navigate — entirely through natural language commands. The AI understands intent, selects the appropriate action, and directly controls the application UI and state.

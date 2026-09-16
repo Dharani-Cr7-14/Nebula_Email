@@ -32,78 +32,76 @@ const EmailList = () => {
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-slate-900 flex flex-col">
+    <div className="flex flex-col h-full bg-white">
       {viewEmails.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-slate-500 p-8">
+        <div className="flex-1 flex items-center justify-center">
           {isCurrentViewLoading ? (
-             <div className="w-full max-w-3xl flex flex-col gap-3">
-               {[...Array(5)].map((_, i) => (
-                 <div key={i} className="w-full h-20 bg-slate-800/50 rounded-lg animate-pulse flex p-4 gap-4">
-                   <div className="w-12 h-12 bg-slate-700/50 rounded-full shrink-0"></div>
-                   <div className="flex-1 flex flex-col gap-2 justify-center">
-                     <div className="w-1/4 h-4 bg-slate-700/50 rounded"></div>
-                     <div className="w-1/2 h-3 bg-slate-700/50 rounded"></div>
-                   </div>
-                 </div>
-               ))}
-             </div>
+            <div className="flex flex-col items-center gap-4 text-gmail-textMuted">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+              <p className="text-sm font-medium">Loading emails...</p>
+            </div>
           ) : (
             <>
-              <div className="text-5xl mb-4 opacity-60">
-                {currentView === 'search' ? '🔎' : '📭'}
-              </div>
-              <h3 className="text-lg font-medium text-slate-300 mb-1">
-                {currentView === 'search' ? 'No emails found' : (filters.unreadOnly ? 'No unread emails here' : 'No emails here')}
-              </h3>
-              <div className="text-sm text-center text-slate-500 mt-2 max-w-md">
+              <div className="text-center max-w-sm px-4">
+                <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                  <div className="w-10 h-10 border-4 border-gray-300 rounded-lg"></div>
+                </div>
+                <h3 className="text-lg font-medium text-gmail-text mb-2">Nothing to see here</h3>
                 {currentView === 'search' ? (
-                  <div className="flex flex-col items-center gap-4 mt-1">
-                    <span>Your search query didn't return any matches:</span>
-                    <code className="px-3 py-1.5 bg-slate-800 rounded-md text-violet-300 text-xs break-all border border-slate-700 shadow-inner">
-                      {searchQuery}
-                    </code>
+                  <div className="flex flex-col items-center">
+                    <p className="text-sm text-gmail-textMuted mb-6">
+                      No emails match your search for "{searchQuery}".
+                    </p>
                     <button 
                       onClick={() => clearSearch()}
-                      className="px-5 py-2 mt-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-lg transition-colors border border-slate-700 shadow-sm"
+                      className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors"
                     >
                       Clear Search
                     </button>
                   </div>
                 ) : (
-                  `Your ${currentView} looks clean.`
+                  <p className="text-sm text-gmail-textMuted">Your {currentView} looks clean.</p>
                 )}
               </div>
             </>
           )}
         </div>
       ) : (
-        <div className="divide-y divide-slate-800/50">
+        <div className="flex flex-col divide-y divide-gray-100 overflow-y-auto">
           {viewEmails.map(email => (
-            <EmailListItem 
-              key={email.id} 
-              email={email} 
-              onClick={() => openEmail(email.id)}
-              isSentView={currentView === 'sent'}
-            />
+            <div key={email.id}>
+              <EmailListItem 
+                email={email} 
+                onClick={() => openEmail(email.id)}
+                isSentView={currentView === 'sent'}
+              />
+            </div>
           ))}
           
-          {nextToken && (
-            <div className="p-4 flex justify-center">
-              <button
+          {/* Load More Indicator */}
+          {nextToken ? (
+            <div className="p-4 flex justify-center border-t border-gray-100">
+              <button 
                 onClick={handleLoadMore}
                 disabled={isCurrentViewLoading}
-                className="px-6 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-violet-300 text-sm font-medium rounded-lg transition-colors border border-slate-700 shadow-sm flex items-center gap-2"
+                className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-gmail-textMuted hover:bg-gray-100 rounded transition-colors disabled:opacity-50"
               >
                 {isCurrentViewLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Loading more emails...
+                    <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                    Loading more...
                   </>
                 ) : (
-                  'Load more emails'
+                  'Load More'
                 )}
               </button>
             </div>
+          ) : (
+            viewEmails.length > 0 && !isCurrentViewLoading && (
+              <div className="p-6 text-center">
+                <p className="text-xs text-gmail-textMuted font-medium">No more emails to load</p>
+              </div>
+            )
           )}
         </div>
       )}

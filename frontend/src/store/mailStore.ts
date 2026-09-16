@@ -28,13 +28,16 @@ interface MailState {
   composeOpen: boolean;
   composeDraft: ComposeDraft;
 
+  // Sidebar State
+  isSidebarCollapsed: boolean;
+
   // Auth Actions
   initAuth: () => Promise<void>;
   login: () => Promise<void>;
   logout: () => Promise<void>;
   
   // Data Actions
-  fetchEmails: (forceView?: 'inbox' | 'sent', pageToken?: string) => Promise<void>;
+  fetchEmails: (forceView?: 'inbox' | 'sent', pageToken?: string, silent?: boolean) => Promise<void>;
 
   // UI Actions
   openInbox: () => void;
@@ -50,6 +53,7 @@ interface MailState {
   setFilters: (filters: Partial<MailFilters>) => void;
   markAsRead: (id: string) => Promise<void>;
   markAsUnread: (id: string) => Promise<void>;
+  toggleSidebar: () => void;
 }
 
 const emptyDraft: ComposeDraft = { to: '', subject: '', body: '' };
@@ -73,6 +77,8 @@ export const useMailStore = create<MailState>((set, get) => ({
   
   composeOpen: false,
   composeDraft: emptyDraft,
+  
+  isSidebarCollapsed: false,
 
   initAuth: async () => {
     set({ isAuthLoading: true, authError: null });
@@ -124,17 +130,19 @@ export const useMailStore = create<MailState>((set, get) => ({
     });
   },
 
-  fetchEmails: async (forceView?: 'inbox' | 'sent', pageToken?: string) => {
+  fetchEmails: async (forceView?: 'inbox' | 'sent', pageToken?: string, silent?: boolean) => {
     if (get().useMockData) return;
     const view = forceView || get().currentView;
-    set(state => ({ loadingViews: { ...state.loadingViews, [view]: true } }));
+    if (!silent) {
+      set(state => ({ loadingViews: { ...state.loadingViews, [view]: true } }));
+    }
     
     try {
       const fetched = view === 'inbox' ? await gmailMailService.getInbox(pageToken) : await gmailMailService.getSent(pageToken);
       
       set((state) => {
         const otherEmails = state.emails.filter(e => e.folder !== view);
-        let existingViewEmails = pageToken ? state.emails.filter(e => e.folder === view) : [];
+        let existingViewEmails = state.emails.filter(e => e.folder === view);
         
         // Preserve any previously loaded full body content for emails that appear in the newly fetched list
         const updatedFetched = fetched.emails.map(newEmail => {
@@ -145,23 +153,31 @@ export const useMailStore = create<MailState>((set, get) => ({
           return newEmail;
         });
         
-        // Deduplicate
-        const mergedViewEmails = [...existingViewEmails];
-        for (const email of updatedFetched) {
+        // Merge keeping the newest items at the top
+        // If it's a page fetch (pageToken exists), append to the end.
+        // If it's a refresh (no pageToken), put new ones at the beginning, deduping older ones.
+        const mergedViewEmails = pageToken ? [...existingViewEmails] : [...updatedFetched];
+        
+        const sourceForDedup = pageToken ? updatedFetched : existingViewEmails;
+        for (const email of sourceForDedup) {
            if (!mergedViewEmails.find(e => e.id === email.id)) {
               mergedViewEmails.push(email);
            }
         }
         
+        const newLoadingViews = silent ? state.loadingViews : { ...state.loadingViews, [view]: false };
+        
         return { 
           emails: [...otherEmails, ...mergedViewEmails],
-          loadingViews: { ...state.loadingViews, [view]: false },
+          loadingViews: newLoadingViews,
           pageTokens: { ...state.pageTokens, [view]: fetched.nextPageToken || null }
         };
       });
     } catch (err) {
       console.error(`Failed to fetch emails for ${view}`, err);
-      set(state => ({ loadingViews: { ...state.loadingViews, [view]: false } }));
+      if (!silent) {
+        set(state => ({ loadingViews: { ...state.loadingViews, [view]: false } }));
+      }
     }
   },
 
@@ -339,4 +355,6 @@ export const useMailStore = create<MailState>((set, get) => ({
       }
     }
   },
+  
+  toggleSidebar: () => set(state => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
 }));

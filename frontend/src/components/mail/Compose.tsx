@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X, Minus, Maximize2 } from 'lucide-react';
 import { useMailStore } from '../../store/mailStore';
 
 const Compose = () => {
@@ -7,34 +7,36 @@ const Compose = () => {
   if (!composeOpen) return null;
 
   return (
-    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] bg-slate-900 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.6)] border border-slate-700 flex flex-col z-[9999] overflow-hidden" style={{ height: '500px' }}>
+    <div className="fixed bottom-0 right-16 w-[500px] bg-white rounded-t-xl shadow-[0_4px_16px_rgba(0,0,0,0.2)] border border-gray-200 flex flex-col z-[9999] overflow-hidden">
       {/* Header */}
-      <div className="bg-slate-800 text-slate-100 px-4 py-3 flex items-center justify-between border-b border-slate-700">
-        <h3 className="font-semibold text-sm">New Message</h3>
-        <button onClick={closeCompose} className="text-slate-400 hover:text-slate-100 transition-colors">
-          <X className="w-4 h-4" />
-        </button>
+      <div className="bg-[#f2f6fc] text-gray-700 px-4 py-2.5 flex items-center justify-between border-b border-gray-200 rounded-t-xl">
+        <h3 className="font-medium text-sm">New Message</h3>
+        <div className="flex items-center gap-1">
+          <button className="text-gray-500 hover:bg-gray-200 p-1 rounded transition-colors"><Minus className="w-4 h-4" /></button>
+          <button className="text-gray-500 hover:bg-gray-200 p-1 rounded transition-colors"><Maximize2 className="w-3.5 h-3.5" /></button>
+          <button onClick={closeCompose} className="text-gray-500 hover:bg-gray-200 p-1 rounded transition-colors"><X className="w-4 h-4" /></button>
+        </div>
       </div>
       
       {/* Form */}
-      <div className="flex-1 flex flex-col p-4">
-        <div className="border-b border-slate-800 pb-2 mb-3">
+      <div className="flex-1 flex flex-col h-[400px]">
+        <div className="border-b border-gray-100 px-4 py-2">
           <div className="flex items-center">
-            <span className="text-slate-400 text-sm font-medium w-16">To</span>
+            <span className="text-gray-500 text-sm w-12">To</span>
             <input 
               type="email" 
-              className="flex-1 focus:outline-none text-sm text-slate-100 bg-transparent"
+              className="flex-1 focus:outline-none text-sm text-gray-800 bg-transparent"
               value={composeDraft.to}
               onChange={(e) => updateComposeDraft({ to: e.target.value })}
             />
           </div>
         </div>
         
-        <div className="border-b border-slate-800 pb-2 mb-3">
+        <div className="border-b border-gray-100 px-4 py-2">
           <div className="flex items-center">
             <input 
               type="text" 
-              className="flex-1 focus:outline-none text-sm font-medium text-slate-100 bg-transparent placeholder-slate-600"
+              className="flex-1 focus:outline-none text-sm text-gray-800 bg-transparent placeholder-gray-400"
               placeholder="Subject"
               value={composeDraft.subject}
               onChange={(e) => updateComposeDraft({ subject: e.target.value })}
@@ -43,27 +45,29 @@ const Compose = () => {
         </div>
         
         <textarea 
-          className="flex-1 focus:outline-none text-sm text-slate-100 bg-transparent resize-none mt-2"
+          className="flex-1 focus:outline-none text-sm text-gray-800 bg-transparent resize-none p-4 leading-relaxed"
           value={composeDraft.body}
           onChange={(e) => updateComposeDraft({ body: e.target.value })}
         />
       </div>
       
       {/* Footer */}
-      <div className="px-4 py-3 border-t border-slate-800 flex items-center gap-3">
+      <div className="px-4 py-3 flex items-center gap-4 border-t border-gray-100">
         <button 
           onClick={sendEmailAction}
           disabled={!composeDraft.to}
-          className="bg-violet-600 hover:bg-violet-500 disabled:bg-violet-800/50 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-semibold py-2 px-6 rounded-full transition-colors text-sm"
+          className="bg-[#0b57d0] hover:bg-[#0842a0] disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed text-white font-medium py-2 px-6 rounded-full transition-all text-sm"
         >
           Send
         </button>
-        <button onClick={closeCompose} className="text-slate-400 hover:text-slate-200 font-medium py-2 px-4 transition-colors text-sm ml-auto">
-          Discard
+        <button onClick={closeCompose} className="text-gray-600 hover:bg-gray-100 font-medium p-2 transition-colors text-sm ml-auto rounded-full">
+          <Trash2 className="w-5 h-5" />
         </button>
       </div>
     </div>
   );
 };
+
+import { Trash2 } from 'lucide-react';
 
 export default Compose;

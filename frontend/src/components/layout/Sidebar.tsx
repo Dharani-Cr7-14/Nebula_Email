@@ -1,119 +1,150 @@
-import { Mail, Send, PenSquare, Sparkles, Star, FileText, Trash2, Search, Edit3, Reply, Loader2 } from 'lucide-react';
+import { Mail, Send, Sparkles, Search, Edit3, Reply, Loader2, Menu, Plus } from 'lucide-react';
 import { useMailStore } from '../../store/mailStore';
+import { cn } from '../../utils/cn';
 
 const Sidebar = () => {
-  const { currentView, openInbox, openSent, openCompose, emails, loadingViews } = useMailStore();
+  const { currentView, openInbox, openSent, openCompose, emails, loadingViews, isSidebarCollapsed, toggleSidebar } = useMailStore();
   
   const unreadCount = emails.filter((e: any) => e.folder === 'inbox' && !e.isRead).length;
   
   const isAnyLoading = Object.values(loadingViews).some(Boolean);
 
   return (
-    <div className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col h-full shrink-0">
-      <div className="p-4 font-bold text-xl text-violet-400 flex items-center justify-between border-b border-slate-800 bg-slate-950">
-        <div className="flex items-center gap-2">
-          <Mail className="w-6 h-6" />
-          <div className="flex flex-col">
-            <span className="leading-none">NebulaMail AI</span>
-            <span className="text-[9px] text-slate-500 uppercase tracking-widest mt-1">AI-Controlled Workspace</span>
+    <div className={cn("bg-gmail-bg flex flex-col h-full shrink-0 relative z-20 transition-all duration-300", isSidebarCollapsed ? "w-[72px]" : "w-[256px]")}>
+      <div className="px-4 py-3 flex items-center gap-4">
+        <button onClick={toggleSidebar} className="p-3 -ml-3 rounded-full hover:bg-gray-200 text-gmail-textMuted transition-colors flex-shrink-0">
+          <Menu className="w-5 h-5" />
+        </button>
+        {!isSidebarCollapsed && (
+          <div className="flex items-center gap-2 overflow-hidden">
+            <div className="w-6 h-6 rounded flex items-center justify-center bg-red-500 text-white shadow-sm flex-shrink-0">
+              <Mail className="w-4 h-4" />
+            </div>
+            <span className="text-xl font-normal text-gray-700 tracking-tight truncate">NebulaMail</span>
           </div>
-        </div>
-        {isAnyLoading && <Loader2 className="w-4 h-4 text-violet-500 animate-spin" />}
+        )}
       </div>
       
-      <div className="p-4">
+      <div className={cn("pt-2 pb-4", isSidebarCollapsed ? "px-2 flex justify-center" : "px-3")}>
         <button 
           onClick={() => openCompose()}
-          className="w-full bg-violet-600 hover:bg-violet-500 text-white font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-lg shadow-violet-900/20"
+          className={cn(
+            "bg-[#c2e7ff] hover:bg-[#b3d4ec] text-[#001d35] font-medium rounded-2xl flex items-center transition-all duration-200 shadow-sm",
+            isSidebarCollapsed ? "w-12 h-12 justify-center" : "py-4 px-6 gap-4 text-sm"
+          )}
+          title="Compose"
         >
-          <PenSquare className="w-5 h-5" />
-          Compose
+          <div className="flex items-center justify-center bg-white rounded-md shadow-sm p-1">
+            <Plus className="w-4 h-4 text-gray-600" />
+          </div>
+          {!isSidebarCollapsed && <span className="pr-2">Compose</span>}
         </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 space-y-1">
+      <nav className="flex-1 overflow-y-auto space-y-0.5 pr-3">
         <button
           onClick={openInbox}
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-md transition-colors ${
+          className={cn(
+            "flex items-center transition-all text-sm font-medium rounded-r-full",
+            isSidebarCollapsed ? "w-12 h-10 ml-2 justify-center rounded-full" : "w-full justify-between px-6 py-2",
             currentView === 'inbox' 
-              ? 'bg-violet-500/10 text-violet-300 font-medium' 
-              : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
-          }`}
+              ? 'bg-gmail-active text-gmail-activeText font-bold' 
+              : 'text-gmail-text hover:bg-gray-200'
+          )}
+          title="Inbox"
         >
-          <div className="flex items-center gap-3">
-            <Mail className="w-5 h-5" />
-            Inbox
+          <div className={cn("flex items-center", isSidebarCollapsed ? "" : "gap-4")}>
+            <Mail className={cn("w-4 h-4", currentView === 'inbox' ? 'text-blue-700' : 'text-gmail-textMuted')} />
+            {!isSidebarCollapsed && "Inbox"}
           </div>
-          {unreadCount > 0 && (
-            <span className="bg-violet-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+          {!isSidebarCollapsed && unreadCount > 0 && (
+            <span className={cn("text-xs font-bold", currentView === 'inbox' ? 'text-gmail-activeText' : 'text-gmail-text')}>
               {unreadCount}
             </span>
           )}
         </button>
 
-
-
         <button
           onClick={openSent}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors ${
+          className={cn(
+            "flex items-center transition-all text-sm font-medium rounded-r-full",
+            isSidebarCollapsed ? "w-12 h-10 ml-2 justify-center rounded-full mt-0.5" : "w-full gap-4 px-6 py-2 mt-0.5",
             currentView === 'sent' 
-              ? 'bg-violet-500/10 text-violet-300 font-medium' 
-              : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
-          }`}
+              ? 'bg-gmail-active text-gmail-activeText font-bold' 
+              : 'text-gmail-text hover:bg-gray-200'
+          )}
+          title="Sent"
         >
-          <Send className="w-5 h-5" />
-          Sent
+          <Send className={cn("w-4 h-4 flex-shrink-0", currentView === 'sent' ? 'text-blue-700' : 'text-gmail-textMuted')} />
+          {!isSidebarCollapsed && "Sent"}
         </button>
 
-
-
-        <div className="pt-4 mt-2 border-t border-slate-800/50">
-          <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-3">AI Tools</h3>
-          <div className="space-y-1">
-            <button 
-              onClick={() => window.dispatchEvent(new CustomEvent('ai-quick-prompt', { detail: { prompt: 'Summarize my recent emails.', autoSubmit: true } }))}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-colors"
-            >
-              <Sparkles className="w-4 h-4 text-violet-400" />
-              Summarize emails
-            </button>
-            <button 
-              onClick={() => window.dispatchEvent(new CustomEvent('ai-quick-prompt', { detail: { prompt: 'Find all my unread emails.', autoSubmit: true } }))}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-colors"
-            >
-              <Search className="w-4 h-4 text-violet-400" />
-              Find unread
-            </button>
-            <button 
-              onClick={() => window.dispatchEvent(new CustomEvent('ai-quick-prompt', { detail: { prompt: 'Draft an email to ', autoSubmit: false } }))}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-colors"
-            >
-              <Edit3 className="w-4 h-4 text-violet-400" />
-              Draft email
-            </button>
-            <button 
-              onClick={() => window.dispatchEvent(new CustomEvent('ai-quick-prompt', { detail: { prompt: 'Reply to the current email saying ', autoSubmit: false } }))}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-colors"
-            >
-              <Reply className="w-4 h-4 text-violet-400" />
-              Reply to email
-            </button>
-          </div>
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          {!isSidebarCollapsed && <div className="px-6 mb-2 text-xs font-semibold text-gmail-textMuted uppercase tracking-wider">AI Tools</div>}
+          
+          <button 
+            onClick={() => window.dispatchEvent(new CustomEvent('ai-quick-prompt', { detail: { prompt: 'Summarize my recent emails.', autoSubmit: true } }))}
+            className={cn(
+              "flex items-center text-sm font-medium text-gmail-text hover:bg-gray-200 transition-all rounded-r-full",
+              isSidebarCollapsed ? "w-12 h-10 ml-2 justify-center rounded-full mt-1" : "w-full gap-4 px-6 py-2 mt-1"
+            )}
+            title="Summarize emails"
+          >
+            <Sparkles className="w-4 h-4 text-blue-600 flex-shrink-0" />
+            {!isSidebarCollapsed && "Summarize emails"}
+          </button>
+          
+          <button 
+            onClick={() => window.dispatchEvent(new CustomEvent('ai-quick-prompt', { detail: { prompt: 'Find all my unread emails.', autoSubmit: true } }))}
+            className={cn(
+              "flex items-center text-sm font-medium text-gmail-text hover:bg-gray-200 transition-all rounded-r-full",
+              isSidebarCollapsed ? "w-12 h-10 ml-2 justify-center rounded-full mt-1" : "w-full gap-4 px-6 py-2 mt-1"
+            )}
+            title="Find unread"
+          >
+            <Search className="w-4 h-4 text-blue-600 flex-shrink-0" />
+            {!isSidebarCollapsed && "Find unread"}
+          </button>
+          
+          <button 
+            onClick={() => window.dispatchEvent(new CustomEvent('ai-quick-prompt', { detail: { prompt: 'Draft an email to ', autoSubmit: false } }))}
+            className={cn(
+              "flex items-center text-sm font-medium text-gmail-text hover:bg-gray-200 transition-all rounded-r-full",
+              isSidebarCollapsed ? "w-12 h-10 ml-2 justify-center rounded-full mt-1" : "w-full gap-4 px-6 py-2 mt-1"
+            )}
+            title="Draft email"
+          >
+            <Edit3 className="w-4 h-4 text-blue-600 flex-shrink-0" />
+            {!isSidebarCollapsed && "Draft email"}
+          </button>
+          
+          <button 
+            onClick={() => window.dispatchEvent(new CustomEvent('ai-quick-prompt', { detail: { prompt: 'Reply to the current email saying ', autoSubmit: false } }))}
+            className={cn(
+              "flex items-center text-sm font-medium text-gmail-text hover:bg-gray-200 transition-all rounded-r-full",
+              isSidebarCollapsed ? "w-12 h-10 ml-2 justify-center rounded-full mt-1" : "w-full gap-4 px-6 py-2 mt-1"
+            )}
+            title="Reply to email"
+          >
+            <Reply className="w-4 h-4 text-blue-600 flex-shrink-0" />
+            {!isSidebarCollapsed && "Reply to email"}
+          </button>
         </div>
       </nav>
       
-      <div className="p-4 border-t border-slate-800 bg-slate-950 mt-auto">
+      <div className={cn("border-t border-gray-200 mt-auto bg-gmail-bg flex items-center", isSidebarCollapsed ? "p-3 justify-center" : "p-4")}>
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center">
-            <Sparkles className="w-3.5 h-3.5 text-white" />
+          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0" title="NebulaMail AI is Ready">
+            <Sparkles className="w-4 h-4 text-blue-600" />
           </div>
-          <div>
-            <div className="text-xs font-semibold text-slate-300 tracking-wide">NebulaMail AI</div>
-            <div className="text-[10px] text-emerald-400 flex items-center gap-1 mt-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              Copilot Ready
+          {!isSidebarCollapsed && (
+            <div className="overflow-hidden">
+              <div className="text-sm font-medium text-gray-700 truncate">NebulaMail AI</div>
+              <div className="text-xs text-green-600 font-medium truncate">
+                Ready
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

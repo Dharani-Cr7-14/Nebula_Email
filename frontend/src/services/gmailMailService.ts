@@ -10,6 +10,9 @@ class GmailMailService {
       credentials: 'include', // Important to send cookies
       headers: {
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
         ...options.headers,
       },
     });

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bot, SendHorizonal, MailPlus, Inbox, Send, Loader2, Sparkles, Search, Edit3, Reply, CheckCircle2, AlertTriangle, ChevronRight } from 'lucide-react';
+import { Bot, SendHorizonal, Inbox, Sparkles, Search, Edit3, Reply, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { executeAIAction, getAIContext } from '../../services/aiActionService';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -89,8 +89,6 @@ const AssistantPanel = () => {
         if (data.tool_calls && data.tool_calls.length > 0) {
           const currentSignature = JSON.stringify(data.tool_calls);
           if (currentSignature === lastToolCallSignature) {
-            // AI is repeating the exact same tool calls without new information.
-            // Break the loop to prevent infinite repetition.
             isDone = true;
             setMessages(prev => [...prev, {
               id: Date.now().toString(),
@@ -203,78 +201,66 @@ const AssistantPanel = () => {
   };
 
   return (
-    <div className="w-[340px] bg-slate-900 border-l border-slate-800 flex flex-col h-full shrink-0 shadow-[-4px_0_24px_rgba(0,0,0,0.2)]">
-      <div className="p-4 border-b border-slate-800 bg-slate-950 flex flex-col gap-1 shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Bot className="w-5 h-5 text-violet-400" />
-            <h2 className="font-semibold text-slate-100 leading-none">AI COMMAND CENTER</h2>
+    <div className="w-[320px] bg-white flex flex-col h-full shrink-0 shadow-sm z-20">
+      <div className="p-4 border-b border-gray-200 bg-white flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-blue-600" />
           </div>
+          <h2 className="font-medium text-gray-800 text-sm">Nebula AI</h2>
         </div>
-        <div className="flex items-center gap-1.5 mt-1 ml-7">
+        <div className="flex items-center">
           {aiStatus === 'ready' ? (
-            <>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-[10px] font-medium text-emerald-400 uppercase tracking-wider">Gemini Ready</span>
-            </>
+            <div className="w-2 h-2 rounded-full bg-green-500" title="System Online"></div>
           ) : (
-            <>
-              <AlertTriangle className="w-3 h-3 text-amber-500" />
-              <span className="text-[10px] font-medium text-amber-500 uppercase tracking-wider">Gemini Temporarily Unavailable</span>
-            </>
+            <div title="Temporarily Unavailable">
+              <AlertTriangle className="w-4 h-4 text-orange-500" />
+            </div>
           )}
         </div>
       </div>
       
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-slate-900/50">
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-gray-50/50">
         
         {/* Dashboard Content */}
         {messages.length === 0 && (
-          <div className="flex flex-col gap-6 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4">
-              <h3 className="text-sm font-bold text-slate-100 mb-1 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-violet-400" /> Your email copilot
+          <div className="flex flex-col gap-6 mb-2">
+            <div className="text-center py-4">
+              <h3 className="text-sm font-medium text-gray-800 mb-1">
+                How can I help you today?
               </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Search, compose, and manage your mailbox using natural language.
+              <p className="text-xs text-gray-500">
+                Ask me to search, draft, or summarize emails.
               </p>
             </div>
 
             <div>
-              <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-1">Quick Actions</h4>
-              <div className="flex flex-wrap gap-2">
-                <button onClick={() => dispatchPrompt("Find my unread emails.", true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800 hover:border-violet-500/30 transition-all text-left">
-                  <Inbox className="w-3.5 h-3.5 text-blue-400" />
-                  <span className="text-xs font-medium text-slate-300">Find Unread</span>
+              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2">Suggestions</h4>
+              <div className="flex flex-col gap-1">
+                <button onClick={() => dispatchPrompt("Find my unread emails.", true)} className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors text-left group">
+                  <Inbox className="w-4 h-4 text-gray-500 group-hover:text-blue-600" />
+                  <span className="text-sm text-gray-700">Find Unread Emails</span>
                 </button>
-                <button onClick={() => dispatchPrompt("Find important emails in my inbox.", true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800 hover:border-violet-500/30 transition-all text-left">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="text-xs font-medium text-slate-300">Find Important</span>
+                <button onClick={() => dispatchPrompt("Find important emails in my inbox.", true)} className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors text-left group">
+                  <AlertTriangle className="w-4 h-4 text-gray-500 group-hover:text-amber-600" />
+                  <span className="text-sm text-gray-700">Find Important Emails</span>
                 </button>
-                <button onClick={() => dispatchPrompt("Help me draft an email.", true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800 hover:border-violet-500/30 transition-all text-left">
-                  <Edit3 className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-xs font-medium text-slate-300">Draft Email</span>
-                </button>
-                <button onClick={() => dispatchPrompt("Help me search my emails.", true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800 hover:border-violet-500/30 transition-all text-left">
-                  <Search className="w-3.5 h-3.5 text-rose-400" />
-                  <span className="text-xs font-medium text-slate-300">Search Emails</span>
-                </button>
-                <button onClick={() => dispatchPrompt("Reply to the currently open email.", true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800 hover:border-violet-500/30 transition-all text-left">
-                  <Reply className="w-3.5 h-3.5 text-indigo-400" />
-                  <span className="text-xs font-medium text-slate-300">Reply</span>
+                <button onClick={() => dispatchPrompt("Help me draft an email.", true)} className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors text-left group">
+                  <Edit3 className="w-4 h-4 text-gray-500 group-hover:text-green-600" />
+                  <span className="text-sm text-gray-700">Draft a new email</span>
                 </button>
               </div>
             </div>
 
             {aiActivity.length > 0 && (
-              <div>
-                <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-1">Recent AI Activity</h4>
-                <div className="flex flex-col gap-2">
+              <div className="mt-4">
+                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2">Recent Activity</h4>
+                <div className="flex flex-col gap-1">
                   {aiActivity.map(activity => (
-                    <div key={activity.id} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-800/30 border border-slate-800">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span className="text-xs font-medium text-slate-300 flex-1 truncate">{getToolDisplayName(activity.name)}</span>
-                      <span className="text-[10px] text-slate-500 shrink-0">{formatDistanceToNow(activity.time, { addSuffix: true })}</span>
+                    <div key={activity.id} className="flex items-center gap-2 px-3 py-2 rounded-md bg-white border border-gray-100 shadow-sm">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                      <span className="text-xs text-gray-600 flex-1 truncate">{getToolDisplayName(activity.name)}</span>
+                      <span className="text-[10px] text-gray-400 shrink-0">{formatDistanceToNow(activity.time, { addSuffix: true })}</span>
                     </div>
                   ))}
                 </div>
@@ -287,10 +273,10 @@ const AssistantPanel = () => {
         {messages.filter(msg => !msg.isAction).map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div 
-              className={`max-w-[85%] p-3 rounded-lg text-sm leading-relaxed shadow-sm ${
+              className={`max-w-[85%] p-3 rounded-lg text-sm leading-relaxed shadow-sm border ${
                 msg.role === 'user' 
-                  ? 'bg-violet-600 text-white rounded-tr-none' 
-                  : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-tl-none'
+                  ? 'bg-blue-50 text-blue-900 border-blue-100 rounded-tr-sm' 
+                  : 'bg-white text-gray-800 border-gray-200 rounded-tl-sm'
               }`}
             >
               {msg.content}
@@ -300,61 +286,37 @@ const AssistantPanel = () => {
         
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-slate-800 p-3 rounded-lg rounded-tl-none border border-slate-700 shadow-sm flex items-center gap-2 text-slate-200 text-sm">
-              <Sparkles className="w-4 h-4 text-violet-400 animate-pulse" />
-              <span>Working on it...</span>
+            <div className="bg-white p-3 rounded-lg rounded-tl-sm border border-gray-200 shadow-sm flex items-center gap-2 text-gray-500 text-sm">
+              <Sparkles className="w-4 h-4 animate-pulse text-blue-500" />
+              <span>Thinking...</span>
             </div>
           </div>
         )}
         
         <div ref={messagesEndRef} className="h-4" />
-        
-        {/* Developer Test Actions (hidden behind details toggle) */}
-        {messages.length > 0 && (
-          <details className="mt-auto border-t border-slate-800/50 pt-4">
-            <summary className="text-[10px] text-center text-slate-600 font-medium mb-3 cursor-pointer hover:text-slate-400 uppercase tracking-wider select-none">
-              Developer Test Actions
-            </summary>
-            <div className="flex flex-col gap-2">
-              <button onClick={() => executeAIAction("open_compose", {})} className="flex items-center justify-center gap-2 w-full py-2 bg-slate-800 border border-slate-700 rounded-md text-xs font-medium text-slate-300 hover:bg-slate-700 transition-colors">
-                <MailPlus className="w-3.5 h-3.5" /> Open Compose
-              </button>
-              <button onClick={() => executeAIAction("navigate_to_inbox", {})} className="flex items-center justify-center gap-2 w-full py-2 bg-slate-800 border border-slate-700 rounded-md text-xs font-medium text-slate-300 hover:bg-slate-700 transition-colors">
-                <Inbox className="w-3.5 h-3.5" /> Go to Inbox
-              </button>
-              <button onClick={() => executeAIAction("navigate_to_sent", {})} className="flex items-center justify-center gap-2 w-full py-2 bg-slate-800 border border-slate-700 rounded-md text-xs font-medium text-slate-300 hover:bg-slate-700 transition-colors">
-                <Send className="w-3.5 h-3.5" /> Go to Sent
-              </button>
-            </div>
-          </details>
-        )}
       </div>
       
-      <div className="p-4 border-t border-slate-800 bg-slate-950 shrink-0">
+      <div className="p-4 border-t border-gray-200 bg-white shrink-0">
         <form 
           onSubmit={handleSubmit}
-          className="relative flex flex-col gap-2"
+          className="relative flex flex-col"
         >
           <div className="relative flex items-center">
             <input 
               type="text" 
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Ask NebulaMail AI anything..." 
-              className="w-full pl-4 pr-11 py-3 rounded-xl border border-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent text-sm bg-slate-900 text-slate-200 placeholder-slate-500 disabled:bg-slate-800 disabled:text-slate-500 transition-colors shadow-inner"
+              placeholder="Ask Nebula AI..." 
+              className="w-full pl-4 pr-10 py-2.5 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm bg-white text-gray-800 placeholder-gray-400 disabled:opacity-50 transition-colors shadow-sm"
               disabled={isLoading}
             />
             <button 
               type="submit"
-              className="absolute right-1.5 p-2 bg-violet-600 text-white rounded-lg hover:bg-violet-500 transition-colors disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed flex items-center justify-center shadow-md"
+              className="absolute right-1.5 p-1.5 text-blue-600 rounded-full hover:bg-blue-50 transition-colors disabled:text-gray-300 disabled:hover:bg-transparent flex items-center justify-center"
               disabled={isLoading || !inputValue.trim()}
             >
-              <SendHorizonal className="w-4 h-4 ml-0.5" />
+              <SendHorizonal className="w-4 h-4" />
             </button>
-          </div>
-          <div className="flex justify-between items-center px-2">
-            <span className="text-[9px] text-slate-500 font-medium tracking-wide">Enter to send</span>
-            <span className="text-[9px] text-slate-600 font-medium tracking-wide">Ctrl+K to focus</span>
           </div>
         </form>
       </div>
