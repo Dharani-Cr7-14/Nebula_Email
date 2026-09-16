@@ -8,8 +8,8 @@ A full-stack, AI-powered web email client that connects to real Gmail accounts v
 
 > This is a dedicated demo account created only for evaluating NebulaMail AI.
 
-**Demo Gmail:** nebulamail.demo@gmail.com  
-**Password:** Nebula@123
+**Demo Gmail:** nebulademo111@gmail.com  
+**Password:** nebulademo@123
 
 ### How to test
 
