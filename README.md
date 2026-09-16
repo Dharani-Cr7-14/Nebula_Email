@@ -34,6 +34,8 @@ The AI works through a structured function-calling loop: the user's request is s
 
 ### Email
 - **Google OAuth login** — real Gmail accounts via OAuth 2.0
+- **Live Syncing** — silent 10-second background polling ensures new emails arrive automatically
+- **Classic UI** — clean, professional interface inspired by classic Gmail design
 - **Inbox** — paginated Gmail Inbox with Load More
 - **Sent Mail** — paginated Gmail Sent with Load More
 - **Compose** — full compose window with To, Subject, Body; sends via Gmail API
