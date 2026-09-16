@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+.email-html-content {
+  overflow-x: auto;
+  max-width: 100%;
+  font-family: inherit;
+  color: #1f2937;
+}
+
+.email-html-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.email-html-content table {
+  max-width: 100%;
+}
+
